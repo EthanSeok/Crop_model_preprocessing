@@ -5,7 +5,7 @@ import subprocess
 files = [
     {
         'name': 'Kosis 생산량 다운로드',
-        'path': './preprocess_kosis_dy.py.py'
+        'path': './preprocess_kosis_dy.py'
     },
     {
         'name': 'APSIM 입력자료 정리',
