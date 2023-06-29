@@ -5,7 +5,7 @@
 모델별 총정리 완료
 
 ### 1. 밀 생산량(통계청) 자료
-1. [preprocess/preprocess_kosis_dy.py](preprocess/preprocess_kosis_dy.py.py)
+1. [preprocess/preprocess_kosis_dy.py](preprocess/preprocess_kosis_dy.py)
 
 ### 2. 기상자료
 1. [preprocess/preprocess_APSIM.py](preprocess/preprocess_APSIM.py)
