@@ -8,10 +8,8 @@ import requests
 import tqdm
 import numpy as np
 import math
-import csv
 from datetime import datetime
-import xlsxwriter as xlsxwriter
-from openpyxl import load_workbook
+
 
 times = datetime.today() - timedelta(days=1)
 today = times.strftime("%m%d")
@@ -141,25 +139,18 @@ def load_data(stn_Ids, stn_Nm, output_dir_txt, site_info, latitude, longitude):
 
     print(filename)
 
-    df = df[['day', 'month', 'year', 'maxt', 'mint', 'rain', 'wind', 'humid', 'radn']]
-    df['Et0(mm)'] = ET.round(1)
-    df.rename(columns={'day': 'Doy',
-                       'month': 'Month',
-                       'year': 'Year',
-                       'mint': 'Tmin(C)',
-                       'maxt': 'Tmax(C)',
-                       'rain': 'Prcp(mm)',
-                       'wind': 'Wind at 10m',
-                       'humid': 'RHmean',
-                       'radn': 'Solar rad'}, inplace=True)
+    df = df[['day', 'month', 'year', 'maxt', 'mint', 'rain']]
+    df['ET0(mm)'] = ET.round(1)
+    df.rename(columns={'day': 'Day', 'month': 'Month', 'year': 'Year', 'mint': 'Tmin(C)', 'maxt': 'Tmax(C)', 'rain': 'Prcp(mm)'}, inplace=True)
+    df["combined"] = df["Year"] * 1000 + df['Day']
+    df["date"] = pd.to_datetime(df["combined"], format="%Y%j")
+    # df = df.drop(columns=['Wind at 10m', 'RHmean', 'Solar rad', 'combined', 'Day'])
+    df['Day'] = df['date'].dt.day
+    df = df.drop(columns=['date'])
+    df = df.set_index(['Day'])
+    df = df[['Month', 'Year', 'Tmin(C)', 'Tmax(C)', 'Prcp(mm)', 'ET0(mm)']]
 
-    df = df[['Doy', 'Month', 'Year', 'Tmin(C)', 'Tmax(C)', 'Prcp(mm)', 'Et0(mm)', 'Wind at 10m', 'RHmean', 'Solar rad']]
-
-    for year in range(start, end+1):
-        df_year  = df[df["Year"] == year]
-        df_year = df_year[['Doy', 'Tmax(C)', 'Tmin(C)', 'Prcp(mm)', 'Wind at 10m', 'Solar rad', 'RHmean']].set_index('Doy')
-        df_year.to_csv(os.path.join(f'{output_dir_txt}/{filename}_{year}.csv'))
-
+    df.to_csv(os.path.join(output_dir_txt, f"{filename}_weather.txt"), sep=' ')
 
     return filename
 
@@ -169,17 +160,9 @@ def main():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    output_dir_txt = "../output/DNDC/out_csv"
+    output_dir_txt = "../output/AquaCrop/weather_txt/"
     if not os.path.exists(output_dir_txt):
         os.makedirs(output_dir_txt)
-
-    # output_dir_met = "../output/weather_met/"
-    # if not os.path.exists(output_dir_met):
-    #     os.makedirs(output_dir_met)
-    #
-    # output_dir_xlsx = "../output/weather_xlsx/"
-    # if not os.path.exists(output_dir_xlsx):
-    #     os.makedirs(output_dir_xlsx)
 
     output_dir_wheat = "../output/kosis_wheat/"
     if not os.path.exists(output_dir_wheat):
@@ -214,26 +197,9 @@ def main():
             stn_Nm = f[i]
             latitude = a['위도'].values[0].item()
             longitude = a['경도'].values[0].item()
-            filename = load_data(stn_Ids, stn_Nm, output_dir_txt, site_info, latitude, longitude)
+            filename = load_data(stn_Ids, stn_Nm, output_dir_txt,site_info, latitude, longitude)
             wheat = pd.read_csv(f"../output/kosis/{filenames_wheat[i]}.csv")
             wheat.to_csv(os.path.join(output_dir_wheat, f"{filename}_weather.csv"), index=False, encoding="utf-8-sig")
-
-    filenames = [x for x in os.listdir(output_dir_txt) if x.endswith(".csv")]
-
-    # output_weather_filename = os.path.join(output_dir_dssat, f"{filename}_weather.wth")
-    for filename in filenames:
-        out_path = f'../output/DNDC/out_txt/{filename[:-9]}'
-        if not os.path.exists(out_path):
-            os.makedirs(out_path)
-
-        meta_info = f"""{filename[:-9]}\n"""
-        with open(os.path.join(out_path, f"{filename.strip('.csv')}.txt"), "w") as fout:
-            fout.write(meta_info)
-            df = pd.read_csv(f'{output_dir_txt}/{filename}')
-            # print(df.dtypes)
-            for idx, row in df.iterrows():
-                fout.write(
-                    f"{int(row['Doy'])}  {row['Tmax(C)']}  {row['Tmin(C)']:3.1f}  {row['Prcp(mm)']:3.1f}  {row['Wind at 10m']:3.1f}  {row['Solar rad']:3.1f}  {row['RHmean']:3.1f}\n")
 
             # except KeyError:
             # print("KeyError: ", f[i])

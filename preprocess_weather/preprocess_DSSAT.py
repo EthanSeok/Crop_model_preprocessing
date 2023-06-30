@@ -8,10 +8,8 @@ import requests
 import tqdm
 import numpy as np
 import math
-import csv
 from datetime import datetime
-import xlsxwriter as xlsxwriter
-from openpyxl import load_workbook
+
 
 times = datetime.today() - timedelta(days=1)
 today = times.strftime("%m%d")
@@ -167,7 +165,7 @@ def load_data(stn_Ids, stn_Nm, output_dir_txt, site_info, latitude, longitude):
     @DISTRIBUTION
 
     @NOTES
-    Created on day 2023-02-07 at 오후 1:39:54
+    Created on day {datetime.today().strftime("%Y-%m-%d")} at {'오후' if datetime.today().strftime("%p") == 'PM' else '오전'} {datetime.today().strftime("%H:%M:%S")}
 
     *DAILY DATA
     @  DATE  TMAX  TMIN  RAIN  WIND  SRAD
@@ -228,14 +226,6 @@ def main():
     output_dir_txt = "../output/DSSAT/weather_txt/"
     if not os.path.exists(output_dir_txt):
         os.makedirs(output_dir_txt)
-
-    # output_dir_met = "../output/weather_met/"
-    # if not os.path.exists(output_dir_met):
-    #     os.makedirs(output_dir_met)
-    #
-    # output_dir_xlsx = "../output/weather_xlsx/"
-    # if not os.path.exists(output_dir_xlsx):
-    #     os.makedirs(output_dir_xlsx)
 
     output_dir_wheat = "../output/kosis_wheat/"
     if not os.path.exists(output_dir_wheat):
