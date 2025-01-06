@@ -23,7 +23,7 @@ def load_data(stn_Ids, stn_Nm, output_dir_txt, site_info, latitude, longitude):
         os.makedirs(cache_dir)
 
     url = 'http://apis.data.go.kr/1360000/AsosDalyInfoService/getWthrDataList'
-    servicekey = 'HOhrXN4295f2VXKpOJc4gvpLkBPC/i97uWk8PfrUIONlI7vRB9ij088/F5RvIjZSz/PUFjJ4zkMjuBkbtMHqUg=='
+    servicekey = ''
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64)'
                              'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132'
                              'Safari/537.36'}
